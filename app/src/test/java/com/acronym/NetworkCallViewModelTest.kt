@@ -32,7 +32,7 @@ class NetworkCallViewModelTest {
             doReturn(flowOf(emptyList<ResponseItem>())).
             `when`(repository)
                 .getLongForm("")
-           verify(repository).getLongForm("")
+            verify(repository).getLongForm("")
         }
     }
 

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.acronym.R
@@ -18,7 +17,6 @@ import com.acronym.model.LongForm
 import com.acronym.utils.SearchState
 import com.acronym.utils.getQueryTextChangeStateFlow
 import com.acronym.viewmodel.MainViewModel
-import com.acronym.viewmodel.VariationsViewModel
 import com.acronym.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.*
@@ -33,8 +31,6 @@ class AcronymSearchFragment : Fragment() {
     private val mainViewModel by activityViewModels<MainViewModel> {
         ViewModelFactory(RetrofitInstance.apiService)
     }
-
-    private val variationViewModel by viewModels<VariationsViewModel>()
 
     private lateinit var adapter: MainAdapter
 
@@ -65,7 +61,15 @@ class AcronymSearchFragment : Fragment() {
         lifecycleScope.launchWhenStarted {
             search_view.getQueryTextChangeStateFlow()
             .debounce(400)
-            .filter { it.length > 1 }
+            .filter {
+                if (it.length > 1) {
+                    recyclerView.visibility = View.VISIBLE
+                    return@filter true
+                } else {
+                    recyclerView.visibility = View.GONE
+                    return@filter false
+                }
+            }
             .distinctUntilChanged()
             .flatMapLatest { query ->
                 mainViewModel.searchState.also{
@@ -107,17 +111,8 @@ class AcronymSearchFragment : Fragment() {
     }
 
     private fun setupUI() {
-
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        adapter = MainAdapter(arrayListOf()) { data ->
-            variationViewModel.data = data.vars
-            activity?.apply {
-               supportFragmentManager.beginTransaction()
-                   .replace(R.id.fragment, VariationsFragment.newInstance())
-                   .addToBackStack(null)
-                   .commit()
-           }
-        }
+        adapter = MainAdapter(arrayListOf())
         recyclerView.adapter = adapter
     }
 

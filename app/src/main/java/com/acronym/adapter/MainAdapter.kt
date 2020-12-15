@@ -8,19 +8,10 @@ import com.acronym.R
 import com.acronym.model.LongForm
 import kotlinx.android.synthetic.main.row_layout.view.*
 
-class MainAdapter(private val data: ArrayList<LongForm>,
-                  private val onItemClicked: (LongForm) -> Unit)
-    : RecyclerView.Adapter<MainAdapter.DataViewHolder>(){
+class MainAdapter(private val data: ArrayList<LongForm>) : RecyclerView.Adapter<MainAdapter.DataViewHolder>(){
 
-    class DataViewHolder(itemView: View,
-                         onItemClicked: (Int) -> Unit)
+    class DataViewHolder(itemView: View)
         : RecyclerView.ViewHolder(itemView) {
-
-        init {
-            itemView.setOnClickListener{
-                onItemClicked(adapterPosition)
-            }
-        }
 
         fun bind(data: LongForm) {
             itemView.apply {
@@ -30,9 +21,7 @@ class MainAdapter(private val data: ArrayList<LongForm>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataViewHolder =
-        DataViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_layout, parent, false)) {
-            onItemClicked(data[it])
-        }
+        DataViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_layout, parent, false))
 
     override fun getItemCount(): Int = data.size
 
